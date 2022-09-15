@@ -1,6 +1,11 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { likeBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
+import store from '../store'
 
-const Blog = ({ blog, blogLike, blogDelete, user }) => {
+const Blog = ({ blog, blogDelete, user }) => {
+  const dispatch = useDispatch()
   const [isViewClicked, setIsViewClicked] = useState(false)
 
   const blogStyle = {
@@ -28,15 +33,24 @@ const Blog = ({ blog, blogLike, blogDelete, user }) => {
     console.log('clicked : ', isViewClicked)
   }
 
-  const likeHandler = () => {
-    const newLikes = blog.likes + 1
-    blogLike(blog.id ,{
-      title: blog.title,
-      url: blog.url,
-      likes: newLikes,
-      author: blog.author,
-      user: blog.user.id
-    })
+  const likeHandler = (id, blog) => {
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1
+    }
+    console.log('id === ', id)
+    console.log('blog === ', updatedBlog)
+    dispatch(likeBlog(id, updatedBlog))
+    dispatch(setNotification(`you have liked ${updatedBlog.title}`, 'success', 3))
+    console.log('after click state === ', store.getState())
+    // console.log('after like = ', store.getState())
+    // blogLike(blog.id ,{
+    //   title: blog.title,
+    //   url: blog.url,
+    //   likes: newLikes,
+    //   author: blog.author,
+    //   user: blog.user.id
+    // })
   }
 
   const blogDeleteHandler = () => {
@@ -54,7 +68,7 @@ const Blog = ({ blog, blogLike, blogDelete, user }) => {
       {
         isViewClicked ?
           <div>
-            <p style={blogDetailStyle}>{blog.url} <br/>{blog.likes} <button onClick={likeHandler}>like</button> <br/> {blog.user.name}</p>
+            <p style={blogDetailStyle}>{blog.url} <br/>{blog.likes} <button onClick={() => likeHandler(blog.id, blog)}>like</button> <br/> {blog.user.name}</p>
             {
               (blog.user.username === user.username) ? <button style={blogDeleteBtn} onClick={blogDeleteHandler}>delete</button> : null
             }

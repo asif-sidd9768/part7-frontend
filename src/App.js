@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { initializeBlogs } from './reducers/blogReducer'
-import Blogs from './components/blogs'
+import { useDispatch } from 'react-redux'
+import { initializeBlogs, createBlog } from './reducers/blogReducer'
+import { setNotification } from './reducers/notificationReducer'
+import Blogs from './components/Blogs'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification/Notification.component'
 import Togglable from './components/Togglable'
@@ -14,10 +15,10 @@ const App = () => {
     dispatch(initializeBlogs())
   }, [])
 
-  const blgs = useSelector(state => state.blogs)
-  console.log('blgsss ===== ', blgs)
+  // const blgs = useSelector(state => state.blogs)
+  // console.log('blgsss ===== ', blgs)
 
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState('')
   const [style, setStyle] = useState('')
@@ -26,20 +27,19 @@ const App = () => {
   const blogFormRef = useRef()
 
 
-  useEffect(() => {
-    blogService.getAll().then(blogs => {
-      blogs.sort(function(a, b) {
-        var keyA = a.likes,
-          keyB = b.likes
-        // Compare the 2 dates
-        if (keyA > keyB) return -1
-        if (keyA < keyB) return 1
-        return 0
-      })
-      setBlogs( blogs )
-      console.log('USE Effect 1')
-    })
-  }, [])
+  // useEffect(() => {
+  //   blogService.getAll().then(blogs => {
+  // blogs.sort(function(a, b) {
+  //   var keyA = a.likes,
+  //   keyB = b.likes
+  //   if (keyA > keyB) return -1
+  //   if (keyA < keyB) return 1
+  //   return 0
+  // })
+  //     setBlogs( blogs )
+  //     console.log('USE Effect 1')
+  //   })
+  // }, [])
 
   useEffect(() => {
     const loggenInUser = window.localStorage.getItem('loggedInUser')
@@ -79,67 +79,69 @@ const App = () => {
   const createBlogHandler = async (newBlog) => {
     try{
       blogFormRef.current.toggleVisibility()
-      const returnedBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(returnedBlog))
-
-      setMessage(`added a new blog ${returnedBlog.title} by ${returnedBlog.author}`)
-      setStyle('success')
-      setTimeout(() => {
-        setMessage('')
-        setStyle('')
-      }, 4000)
+      dispatch(createBlog(newBlog))
+      // const returnedBlog = await blogService.create(newBlog)
+      // setBlogs(blogs.concat(returnedBlog))
+      dispatch(setNotification(`added a new blog ${newBlog.title} by ${newBlog.author}`, 'success', 3))
+      // setMessage(`added a new blog ${newBlog.title} by ${newBlog.author}`)
+      // setStyle('success')
+      // setTimeout(() => {
+      //   setMessage('')
+      //   setStyle('')
+      // }, 4000)
     }catch(exception) {
-      setMessage('unable to add the blog')
-      setStyle('error')
-      setTimeout(() => {
-        setMessage('')
-        setStyle('')
-      }, 4000)
+      dispatch(setNotification('unable to add the blog'))
+      // setMessage('unable to add the blog')
+      // setStyle('error')
+      // setTimeout(() => {
+      //   setMessage('')
+      //   setStyle('')
+      // }, 4000)
     }
   }
 
-  const blogLikeHandler = async (id, updatedBlog) => {
-    try{
-      //console.log(id, updatedBlog)
-      const returnedBlog = await blogService.update(id, updatedBlog)
-      // console.log(returnedBlog)
-      setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+  // const blogLikeHandler = async (id, updatedBlog) => {
+  //   try{
+  //     //console.log(id, updatedBlog)
+  //     const returnedBlog = await blogService.update(id, updatedBlog)
+  //     // console.log(returnedBlog)
+  //     setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
 
-      setMessage(`you have liked ${returnedBlog.title}`)
-      setStyle('success')
-      setTimeout(() => {
-        setMessage('')
-        setStyle('')
-      }, 1000)
-    } catch(exception){
-      setMessage('unable to like the blog')
-      setStyle('error')
-      setTimeout(() => {
-        setMessage('')
-        setStyle('')
-      }, 1000)
-    }
-  }
+  //     setMessage(`you have liked ${returnedBlog.title}`)
+  //     setStyle('success')
+  //     setTimeout(() => {
+  //       setMessage('')
+  //       setStyle('')
+  //     }, 1000)
+  //   } catch(exception){
+  //     setMessage('unable to like the blog')
+  //     setStyle('error')
+  //     setTimeout(() => {
+  //       setMessage('')
+  //       setStyle('')
+  //     }, 1000)
+  //   }
+  // }
 
-  const blogDeleteHandler = async (id) => {
-    try {
-      await blogService.deleteBlog(id)
+  // const blogDeleteHandler = async (id) => {
+  //   try {
+  //     await blogService.deleteBlog(id)
 
-      setMessage('Successfully deleted the blog')
-      setStyle('success')
-      setTimeout(() => {
-        setMessage('')
-        setStyle('')
-      }, 3000)
-    }catch(exception){
-      setMessage('unable to delete the blog')
-      setStyle('error')
-      setTimeout(() => {
-        setMessage('')
-        setStyle('')
-      }, 3000)
-    }
-  }
+  //     setMessage('Successfully deleted the blog')
+  //     setStyle('success')
+  //     setTimeout(() => {
+  //       setMessage('')
+  //       setStyle('')
+  //     }, 3000)
+  //   }catch(exception){
+  //     setMessage('unable to delete the blog')
+  //     setStyle('error')
+  //     setTimeout(() => {
+  //       setMessage('')
+  //       setStyle('')
+  //     }, 3000)
+  //   }
+  // }
 
   const logoutHandle = () => {
     window.localStorage.removeItem('loggedInUser')
@@ -182,10 +184,7 @@ const App = () => {
         <BlogForm createBlog={createBlogHandler} />
       </Togglable>
       <Blogs
-        blogs={blogs}
         user={user}
-        blogDeleteHandler={blogDeleteHandler}
-        blogLikeHandler={blogLikeHandler}
       />
     </div>
   )
