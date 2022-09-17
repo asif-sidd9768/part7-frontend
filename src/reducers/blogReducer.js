@@ -8,11 +8,7 @@ const blogSlice = createSlice({
   initialState,
   reducers: {
     likeBlogRed (state, action) {
-      console.log('action == ', action.payload)
       const [ id, updatedBlog ] = action.payload
-      // const blogToLike = state.find(n => n.id === id)
-      // const likedBlog = { ...blogToLike, likes: blogToLike + 1 }
-      // console.log('liked === ', updatedBlog)
       return state.map( blog => blog.id !== id ? blog : updatedBlog )
     },
     setBlogs (state, action) {
@@ -42,10 +38,24 @@ export const createBlog = content => {
 
 export const likeBlog = (id, updatedBlog) => {
   return async dispatch => {
+
+    // "title": "Oogie boogie boo",
+    // "url": "asifsiddique.in/blogs",
+    // "likes": 10,
+    // "author": "Maddy Keddy",
+    // "user": "630a244692ec9e2f845260cd"
+    const blogToUpdate = {
+      title: updatedBlog.title,
+      url: updatedBlog.url,
+      likes: updatedBlog.likes,
+      author: updatedBlog.author,
+      user: updatedBlog.user.id
+    }
+
     console.log('id === ', id)
     console.log('blog === ', updatedBlog)
     console.log(`ids == ${id} - ${updatedBlog.id}`)
-    await blogService.update(id, updatedBlog)
+    await blogService.update(id, blogToUpdate)
     dispatch(likeBlogRed([ id, updatedBlog]))
   }
 }

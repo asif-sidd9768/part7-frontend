@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { likeBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
-import store from '../store'
 
 const Blog = ({ blog, blogDelete, user }) => {
   const dispatch = useDispatch()
@@ -42,15 +41,6 @@ const Blog = ({ blog, blogDelete, user }) => {
     console.log('blog === ', updatedBlog)
     dispatch(likeBlog(id, updatedBlog))
     dispatch(setNotification(`you have liked ${updatedBlog.title}`, 'success', 3))
-    console.log('after click state === ', store.getState())
-    // console.log('after like = ', store.getState())
-    // blogLike(blog.id ,{
-    //   title: blog.title,
-    //   url: blog.url,
-    //   likes: newLikes,
-    //   author: blog.author,
-    //   user: blog.user.id
-    // })
   }
 
   const blogDeleteHandler = () => {
