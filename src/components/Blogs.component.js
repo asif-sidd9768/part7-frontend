@@ -2,12 +2,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 // import { likeBlog } from '../reducers/blogReducer'
 import blogService from '../services/blogs'
-import Blog from './Blog'
+import Blog from './Blog.component'
 
-const Blogs = ({ user }) => {
+const Blogs = () => {
+  const user = useSelector(state => state.user)
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
-
+  console.log('user === ', user)
   //sorting blogs based on likes
   const sortedBlogs = [...blogs]
   sortedBlogs.sort(function(a, b) {

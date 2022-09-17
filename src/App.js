@@ -3,10 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { initializeBlogs, createBlog } from './reducers/blogReducer'
 import { setNotification } from './reducers/notificationReducer'
 import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
-import Blogs from './components/Blogs'
-import BlogForm from './components/BlogForm'
+import Blogs from './components/Blogs.component'
+import BlogForm from './components/BlogForm.component'
 import Notification from './components/Notification/Notification.component'
-import Togglable from './components/Togglable'
+import Togglable from './components/Togglable.component'
+import Menu from './components/Menu/Menu.component'
+import { Route, Routes } from 'react-router-dom'
+import { Container } from 'react-bootstrap'
+import Users from './components/Users/Users.component'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -83,17 +87,30 @@ const App = () => {
       </div>
     )
   }
+
+  const padding = {
+    padding: 5
+  }
   return (
     <div>
-      <Notification />
-      <h2>blogs</h2>
-      <p><span>{user.name}</span> logged in <button onClick={() => logoutHandle()}>logout</button></p>
-      <Togglable buttonLabel="add new blog" ref={blogFormRef}>
-        <BlogForm createBlog={createBlogHandler} />
-      </Togglable>
-      <Blogs
-        user={user}
-      />
+      <Container style={padding}>
+        <Menu user={user} logoutHandler={logoutHandle} />
+        <Notification />
+        <h2>blogs</h2>
+        <Togglable buttonLabel="add new blog" ref={blogFormRef}>
+          <BlogForm createBlog={createBlogHandler} />
+        </Togglable>
+        {/* <Blogs user={user} /> */}
+        <Routes>
+          <Route path="/users" element={<Users />}></Route>
+          <Route path="/" element={<Blogs />}></Route>
+        </Routes>
+
+        <div style={{ marginTop: 30 }}>
+          <hr/>
+          <footer>© 2022, All Rights Reserved.</footer>
+        </div>
+      </Container>
     </div>
   )
 }
